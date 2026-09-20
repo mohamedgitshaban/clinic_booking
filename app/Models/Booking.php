@@ -43,4 +43,13 @@ class Booking extends Model
         return $this->belongsToMany(Service::class)
             ->withPivot(['price', 'duration']);
     }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Booking $booking): void {
+            $booking->slot_key = $booking->status === BookingStatus::Cancelled
+                ? null
+                : sprintf('%d|%s|%s', $booking->doctor_id, $booking->date?->format('Y-m-d'), $booking->start_time);
+        });
+    }
 }
