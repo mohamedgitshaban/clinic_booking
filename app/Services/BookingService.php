@@ -67,7 +67,7 @@ class BookingService
                 ])
             );
 
-            return $booking->load('services');
+            return $booking->load('services')->setRelation('doctor', $doctor);
         });
     }
 }
