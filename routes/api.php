@@ -23,4 +23,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings/preview', [BookingController::class, 'preview']);
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/my-bookings', [BookingController::class, 'index']);
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
+    Route::post('/bookings/{booking}/reschedule', [BookingController::class, 'reschedule']);
 });

@@ -12,7 +12,7 @@ class RescheduleBookingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return (bool) $this->user()?->can('reschedule', $this->route('booking'));
     }
 
     /**
@@ -23,7 +23,8 @@ class RescheduleBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
+            'time' => ['required', 'date_format:H:i'],
         ];
     }
 }
