@@ -37,6 +37,24 @@ class Doctor extends Model
         return $this->hasMany(Booking::class);
     }
 
+    /**
+     * Determine whether every given service ID is offered by this doctor.
+     *
+     * @param  array<int, int>  $serviceIds
+     */
+    public function offersServices(array $serviceIds): bool
+    {
+        if ($serviceIds === []) {
+            return false;
+        }
+
+        $matchingCount = $this->services()
+            ->whereIn('services.id', $serviceIds)
+            ->count();
+
+        return $matchingCount === count(array_unique($serviceIds));
+    }
+
     #[Scope]
     protected function active(Builder $query): Builder
     {
