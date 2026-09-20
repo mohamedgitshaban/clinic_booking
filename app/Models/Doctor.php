@@ -37,6 +37,11 @@ class Doctor extends Model
         return $this->hasMany(Booking::class);
     }
 
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(DoctorSchedule::class);
+    }
+
     /**
      * Determine whether every given service ID is offered by this doctor.
      *

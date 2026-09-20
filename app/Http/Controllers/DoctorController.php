@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AvailableSlotsRequest;
 use App\Http\Resources\DoctorResource;
 use App\Http\Resources\ServiceResource;
 use App\Models\Doctor;
+use App\Services\AvailabilityService;
+use App\Services\BookingPriceCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Carbon;
 
 class DoctorController extends Controller
 {
@@ -27,6 +31,25 @@ class DoctorController extends Controller
                 'name' => $doctor->name,
             ],
             'services' => ServiceResource::collection($services),
+        ]);
+    }
+
+    public function availableSlots(
+        AvailableSlotsRequest $request,
+        Doctor $doctor,
+        AvailabilityService $availability,
+        BookingPriceCalculator $calculator
+    ): JsonResponse {
+        $services = $doctor->services()
+            ->whereIn('services.id', $request->validated('service_ids'))
+            ->get();
+
+        $totalDuration = $calculator->calculate($services)['total_duration'];
+        $date = Carbon::parse($request->validated('date'));
+
+        return response()->json([
+            'date' => $date->format('Y-m-d'),
+            'slots' => $availability->getAvailableSlots($doctor, $date, $totalDuration),
         ]);
     }
 }

@@ -10,6 +10,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/doctors', [DoctorController::class, 'index']);
 Route::get('/doctors/{doctor}/services', [DoctorController::class, 'services']);
+Route::get('/doctors/{doctor}/available-slots', [DoctorController::class, 'availableSlots']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
