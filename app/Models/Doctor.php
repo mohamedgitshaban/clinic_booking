@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 #[Fillable(['name', 'email', 'phone', 'specialization', 'bio', 'is_active'])]
 class Doctor extends Model
@@ -58,6 +59,20 @@ class Doctor extends Model
             ->count();
 
         return $matchingCount === count(array_unique($serviceIds));
+    }
+
+    /**
+     * Resolve this doctor's own service records for the given IDs, ignoring
+     * any ID that isn't actually offered by this doctor.
+     *
+     * @param  array<int, int>  $serviceIds
+     * @return Collection<int, Service>
+     */
+    public function resolveServices(array $serviceIds): Collection
+    {
+        return $this->services()
+            ->whereIn('services.id', $serviceIds)
+            ->get();
     }
 
     #[Scope]

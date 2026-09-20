@@ -33,9 +33,7 @@ class BookingController extends Controller
     public function preview(BookingPreviewRequest $request, BookingPriceCalculator $calculator): JsonResponse
     {
         $doctor = Doctor::findOrFail($request->validated('doctor_id'));
-        $services = $doctor->services()
-            ->whereIn('services.id', $request->validated('service_ids'))
-            ->get();
+        $services = $doctor->resolveServices($request->validated('service_ids'));
 
         $totals = $calculator->calculate($services);
 
@@ -51,9 +49,7 @@ class BookingController extends Controller
     public function store(StoreBookingRequest $request, BookingService $bookingService): JsonResponse
     {
         $doctor = Doctor::findOrFail($request->validated('doctor_id'));
-        $services = $doctor->services()
-            ->whereIn('services.id', $request->validated('service_ids'))
-            ->get();
+        $services = $doctor->resolveServices($request->validated('service_ids'));
 
         $booking = $bookingService->book(
             $request->user(),

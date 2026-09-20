@@ -40,9 +40,7 @@ class DoctorController extends Controller
         AvailabilityService $availability,
         BookingPriceCalculator $calculator
     ): JsonResponse {
-        $services = $doctor->services()
-            ->whereIn('services.id', $request->validated('service_ids'))
-            ->get();
+        $services = $doctor->resolveServices($request->validated('service_ids'));
 
         $totalDuration = $calculator->calculate($services)['total_duration'];
         $date = Carbon::parse($request->validated('date'));
