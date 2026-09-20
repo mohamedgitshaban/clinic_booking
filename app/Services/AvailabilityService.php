@@ -15,9 +15,13 @@ class AvailabilityService
      * for a booking that needs $durationMinutes, excluding slots that would
      * overlap an existing (non-cancelled) booking.
      *
+     * Pass $excludingBookingId when checking availability for a booking that
+     * is itself being rescheduled, so its own current slot isn't treated as
+     * occupied.
+     *
      * @return array<int, string>
      */
-    public function getAvailableSlots(Doctor $doctor, Carbon $date, int $durationMinutes): array
+    public function getAvailableSlots(Doctor $doctor, Carbon $date, int $durationMinutes, ?int $excludingBookingId = null): array
     {
         if ($durationMinutes <= 0) {
             return [];
@@ -35,6 +39,7 @@ class AvailabilityService
         $bookedRanges = $doctor->bookings()
             ->whereDate('date', $date)
             ->where('status', '!=', BookingStatus::Cancelled)
+            ->when($excludingBookingId, fn ($query, $id) => $query->where('id', '!=', $id))
             ->get(['start_time', 'end_time']);
 
         $scheduleEnd = Carbon::parse($schedule->end_time);
